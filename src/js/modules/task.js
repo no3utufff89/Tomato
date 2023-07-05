@@ -36,7 +36,15 @@ const item = new Task('Почистить апельсин', );
 
 // Пробуем менять, получаем фигу
 item.name = 'dsfsdfsdfsdfsdf'
-console.log(item)
 console.log(item.id);
+console.log(item.name);
+console.log(item.count);
+
+// Меняем данные через методы
+item.changeCount();
+item.changeName('Сочный апельсин')
+
+// Вывод объекта с изменениями
+console.log(`Объект с изменениями`,item)
 console.log(item.name);
 console.log(item.count);
