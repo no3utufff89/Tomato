@@ -1,4 +1,6 @@
 import './modules/task.js'
+import {Tomato} from "./modules/tomato";
+import {Task} from "./modules/task";
 
 let count = 0;
 const imp = ['default', 'important', 'so-so']
@@ -16,4 +18,17 @@ document.querySelector('.button-importance').addEventListener('click', ({target}
     }
   }
 })
+
+const tomato = new Tomato([]);
+
+const taskForm = document.querySelector('.task-form');
+taskForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const newTask = new Task(taskForm['task-name'].value);
+  console.log(newTask);
+  tomato.addTask(newTask);
+  console.log(`tomato`,tomato)
+})
+
 
