@@ -44,25 +44,640 @@ __webpack_require__(/*! regenerator-runtime/runtime */ "./node_modules/regenerat
 /*!************************!*\
   !*** ./src/js/main.js ***!
   \************************/
-/***/ (() => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-let count = 0;
-const imp = ['default', 'important', 'so-so'];
-document.querySelector('.button-importance').addEventListener('click', ({
-  target
-}) => {
-  count += 1;
-  if (count >= imp.length) {
-    count = 0;
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   activeTomato: () => (/* binding */ activeTomato),
+/* harmony export */   controller: () => (/* binding */ controller),
+/* harmony export */   timer: () => (/* binding */ timer),
+/* harmony export */   tomato: () => (/* binding */ tomato)
+/* harmony export */ });
+/* harmony import */ var _modules_task_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modules/task */ "./src/js/modules/task.js");
+/* harmony import */ var _modules_tomato__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/tomato */ "./src/js/modules/tomato.js");
+/* harmony import */ var _modules_renderApp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/renderApp */ "./src/js/modules/renderApp.js");
+/* harmony import */ var _modules_controller__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/controller */ "./src/js/modules/controller.js");
+/* harmony import */ var _modules_timer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/timer */ "./src/js/modules/timer.js");
+
+
+
+
+
+
+const tomato = new _modules_tomato__WEBPACK_IMPORTED_MODULE_1__.Tomato([]);
+const activeTomato = new _modules_renderApp__WEBPACK_IMPORTED_MODULE_2__.RenderApp('.main__container', tomato);
+const controller = new _modules_controller__WEBPACK_IMPORTED_MODULE_3__.Controller(tomato);
+const timer = new _modules_timer__WEBPACK_IMPORTED_MODULE_4__.Timer(tomato.taskTime, tomato.pauseTime, tomato.bigPauseTime);
+activeTomato.init();
+controller.mainControll();
+
+/***/ }),
+
+/***/ "./src/js/modules/controller.js":
+/*!**************************************!*\
+  !*** ./src/js/modules/controller.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Controller: () => (/* binding */ Controller)
+/* harmony export */ });
+/* harmony import */ var _createTask__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./createTask */ "./src/js/modules/createTask.js");
+/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../main */ "./src/js/main.js");
+
+
+class Controller {
+  constructor(tomato) {
+    this.tomato = tomato;
   }
-  for (let i = 0; i < imp.length; i++) {
-    if (count === i) {
-      target.classList.add(imp[i]);
+  mainControll() {
+    this.addTask();
+    this.importanceChange();
+    this.toActive();
+    this.startTimer();
+    this.openTaskModal();
+    this.taskModal();
+  }
+
+  // Добавление задачи
+  addTask() {
+    const form = document.querySelector('.task-form');
+    const input = form['task-name'];
+    let inputValue = '';
+    input.addEventListener('input', e => {
+      inputValue = input.value;
+    });
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+      const importance = form.querySelector('.button-importance').classList[2];
+      (0,_createTask__WEBPACK_IMPORTED_MODULE_0__.taskCreation)(data['task-name'], 0, importance);
+      form.reset();
+      console.log(_main__WEBPACK_IMPORTED_MODULE_1__.tomato);
+    });
+  }
+
+  // Смена важности
+  importanceChange() {
+    document.addEventListener('click', e => {
+      const target = e.target;
+      if (target.closest('.button-importance')) {
+        if (target.closest('.default')) {
+          target.classList.remove('default');
+          target.classList.add('so-so');
+        } else if (target.closest('.so-so')) {
+          target.classList.remove('so-so');
+          target.classList.add('important');
+        } else if (target.closest('.important')) {
+          target.classList.remove('important');
+          target.classList.add('default');
+        }
+      }
+    });
+  }
+
+  // Активирование задачи
+  toActive() {
+    const tasks = document.querySelector('.pomodoro-tasks__quest-tasks');
+    tasks.addEventListener('click', e => {
+      const target = e.target;
+      if (target.closest('.pomodoro-tasks__task-text ')) {
+        _main__WEBPACK_IMPORTED_MODULE_1__.tomato.tasks.forEach((item, index) => {
+          if (item.name === target.parentNode.children[1].textContent) {
+            _main__WEBPACK_IMPORTED_MODULE_1__.tomato.activateTask(item.id);
+          }
+        });
+        target.parentNode.children[1].classList.add('pomodoro-tasks__task-text_active');
+        _main__WEBPACK_IMPORTED_MODULE_1__.activeTomato.renderApp();
+      }
+    });
+  }
+
+  // Запуск таймера
+  startTimer() {
+    document.addEventListener('click', e => {
+      const target = e.target;
+      if (target.closest('.button-start')) {
+        _main__WEBPACK_IMPORTED_MODULE_1__.tomato.taskTimerRun();
+      }
+    });
+  }
+
+  // Открыть модалку
+  openTaskModal() {
+    document.addEventListener('click', e => {
+      const target = e.target;
+      if (target.closest('.pomodoro-tasks__task-button')) {
+        target.parentNode.children[3].classList.toggle('burger-popup_active');
+      }
+    });
+  }
+
+  // Кнопки в модалке
+  taskModal() {
+    document.addEventListener('click', e => {
+      const target = e.target;
+      const modal = document.querySelector('.modal-overlay');
+      if (target.closest('.burger-popup__delete-button')) {
+        const taskName = document.querySelector('.burger-popup_active').parentNode.children[1].textContent;
+        _main__WEBPACK_IMPORTED_MODULE_1__.tomato.removeTask(taskName);
+      }
+    });
+  }
+}
+
+/***/ }),
+
+/***/ "./src/js/modules/createTask.js":
+/*!**************************************!*\
+  !*** ./src/js/modules/createTask.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TaskCreation: () => (/* binding */ TaskCreation),
+/* harmony export */   taskCreation: () => (/* binding */ taskCreation)
+/* harmony export */ });
+/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../main */ "./src/js/main.js");
+/* harmony import */ var _task__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./task */ "./src/js/modules/task.js");
+
+
+class TaskCreationCommand {
+  constructor(name, count, importance) {
+    this.name = name;
+    this.count = count;
+    this.importance = importance;
+  }
+  execute() {
+    throw new Error('Not implemented');
+  }
+}
+class ToCommon extends TaskCreationCommand {
+  execute() {
+    const newTask = new _task__WEBPACK_IMPORTED_MODULE_1__.CommonTask(this.name, this.count);
+    _main__WEBPACK_IMPORTED_MODULE_0__.tomato.addTask(newTask);
+  }
+}
+class ToNormal extends TaskCreationCommand {
+  execute() {
+    const newTask = new _task__WEBPACK_IMPORTED_MODULE_1__.NormalTask(this.name, this.count);
+    _main__WEBPACK_IMPORTED_MODULE_0__.tomato.addTask(newTask);
+  }
+}
+class ToImportant extends TaskCreationCommand {
+  execute() {
+    const newTask = new _task__WEBPACK_IMPORTED_MODULE_1__.ImportantTask(this.name, this.count);
+    _main__WEBPACK_IMPORTED_MODULE_0__.tomato.addTask(newTask);
+  }
+}
+class TaskCreation {
+  constructor() {
+    this.commands = [];
+  }
+  operation(name, count, importance) {
+    let Command;
+    if (importance === 'default') {
+      Command = ToCommon;
+    } else if (importance === 'so-so') {
+      Command = ToNormal;
     } else {
-      target.classList.remove(imp[i]);
+      Command = ToImportant;
+    }
+    const command = new Command(name, count, importance);
+    if (command.execute()) {
+      this.commands.push(command);
     }
   }
-});
+}
+const taskCreation = (name, count, importance) => {
+  const task = new TaskCreation(name, count);
+  task.operation(name, count, importance);
+};
+
+/***/ }),
+
+/***/ "./src/js/modules/renderApp.js":
+/*!*************************************!*\
+  !*** ./src/js/modules/renderApp.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   RenderApp: () => (/* binding */ RenderApp)
+/* harmony export */ });
+/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../main */ "./src/js/main.js");
+
+class RenderApp {
+  constructor(target, app) {
+    this.target = target;
+    this.app = app;
+  }
+  init() {
+    this.leftSide = document.createElement('div');
+    this.leftSide.classList.add('pomodoro-form', 'window');
+    this.reightSide = document.createElement('div');
+    this.reightSide.classList.add('pomodoro-form', 'window');
+    this.wrapper = document.createElement('div');
+    this.tasksListWraper = document.createElement('div');
+    this.tasksListWraper.className = 'pomodoro-tasks';
+    this.tasksList = document.createElement('ul');
+    this.tasksList.className = 'pomodoro-tasks__quest-tasks';
+    this.renderApp();
+  }
+
+  //Главный рендер метод(сборка)
+  renderApp() {
+    this.leftSide.innerHTML = '';
+    const activeTitle = this.renderTitle();
+    const activeWindow = this.renderMainWindow();
+    this.leftSide.append(activeTitle, activeWindow);
+    if (!document.querySelector('.task-form')) {
+      const taskForm = this.renderForm();
+      this.reightSide.append(taskForm);
+    }
+    this.wrapper.append(this.leftSide, this.reightSide);
+    this.renderTasksList();
+    this.tasksListWraper.append(this.tasksList);
+    if (!document.querySelector('.pomodoro-tasks__quest-list')) {
+      const instructions = this.renderInstructions();
+      this.tasksListWraper.insertBefore(instructions[0], this.tasksList);
+      this.tasksListWraper.insertBefore(instructions[1], this.tasksList);
+    }
+    this.tasksListWraper.append(this.tasksList);
+    document.querySelector(this.target).append(this.wrapper, this.tasksListWraper);
+  }
+
+  // Создаем форму
+  renderForm() {
+    const taskForm = document.createElement('form');
+    taskForm.className = 'task-form';
+    taskForm.insertAdjacentHTML('afterbegin', `
+                  <input type="text" class="task-name input-primary"
+                    name="task-name" id="task-name" placeholder="название задачи" required>
+                  <button type="button" class="button button-importance default"
+                    aria-label="Указать важность"></button>
+                  <button type="submit" class="button button-primary task-form__add-button">
+                    Добавить</button>
+                `);
+    return taskForm;
+  }
+
+  // Создаем инструкцию
+  renderInstructions() {
+    const instructionTitle = document.createElement('p');
+    instructionTitle.className = 'pomodoro-tasks__header-title';
+    instructionTitle.textContent = 'Инструкция:';
+    const instructions = document.createElement('ul');
+    instructions.className = 'pomodoro-tasks__quest-list';
+    instructions.insertAdjacentHTML('afterbegin', `
+      <li class="pomodoro-tasks__list-item">
+        Напишите название задачи чтобы её добавить
+      </li>
+      <li class="pomodoro-tasks__list-item">
+        Чтобы задачу активировать, выберите её из списка
+      </li>
+      <li class="pomodoro-tasks__list-item">
+        Запустите таймер
+      </li>
+      <li class="pomodoro-tasks__list-item">
+        Работайте пока таймер не прозвонит
+      </li>
+      <li class="pomodoro-tasks__list-item">
+        Сделайте короткий перерыв (5 минут)
+      </li>
+      <li class="pomodoro-tasks__list-item">
+        Продолжайте работать, пока задача не будет выполнена.
+      </li>
+      <li class="pomodoro-tasks__list-item">
+        Каждые 4 периода таймера делайте длинный перерыв (15-20 минут).
+      </li>
+    `);
+    return [instructionTitle, instructions];
+  }
+
+  //Создаем главной окно с таймером
+  renderMainWindow() {
+    const activeWindow = document.createElement('div');
+    activeWindow.className = 'window__body';
+    activeWindow.insertAdjacentHTML('afterbegin', `
+      <p class="window__timer-text">00:00</p>
+      <div class="window__buttons">
+        <button class="button button-primary button-start">Старт</button>
+        <button class="button button-secondary button-stop">Стоп</button>
+      </div>
+    `);
+    return activeWindow;
+  }
+
+  //Создаем заголовок
+  renderTitle() {
+    const titleWraper = document.createElement('div');
+    titleWraper.className = 'window__panel';
+    if (!this.app.activeTask) {
+      titleWraper.insertAdjacentHTML('afterbegin', `
+        <p class="window__panel-title">Выберите задачу из списка </p>
+        <p class="window__panel-task-text"></p>
+    `);
+    } else {
+      titleWraper.insertAdjacentHTML('afterbegin', `
+        <p class="window__panel-title">${this.app.activeTask.name}</p>
+        <p class="window__panel-task-text">${this.app.activeTask.count}</p>
+    `);
+    }
+    return titleWraper;
+  }
+  renderTasksList() {
+    this.tasksList.innerHTML = '';
+    //Если важен порядок задач
+    // const defaultList = [];
+    // const soSo = [];
+    // const important = [];
+    // this.app.tasks.forEach(item => {
+    //     if (item.importance === 'default') defaultList.push(item);
+    //     if (item.importance === 'important') soSo.push(item);
+    //     if (item.importance === 'so-so') important.push(item);
+    // });
+    // const tasks = [ ...defaultList, ...soSo, ...important];
+
+    // если все по порядку
+
+    const tasks = _main__WEBPACK_IMPORTED_MODULE_0__.tomato.tasks;
+    if (tasks.length < 1) {
+      const warn = document.createElement('li');
+      warn.style.cssText = 'color: black; font-weight: bold;';
+      warn.textContent = 'Нет задач';
+      this.tasksList.append(warn);
+    }
+    tasks.forEach((item, index) => {
+      const task = document.createElement('li');
+      task.classList.add(`pomodoro-tasks__list-task`, `${item.importance}`);
+      task.insertAdjacentHTML('afterbegin', `
+      <span class="count-number">${item.count}</span>
+      <button class="pomodoro-tasks__task-text">${item.name}</button>
+      <button class="pomodoro-tasks__task-button"></button>
+      <div class="burger-popup">
+        <button class="popup-button burger-popup__edit-button">
+          Редактировать</button>
+        <button class="popup-button burger-popup__delete-button">
+          Удалить</button>
+      </div>
+    `);
+      if (this.app.activeTask !== null) {
+        if (item.id === this.app.activeTask.id) {
+          task.children[1].classList.add('pomodoro-tasks__task-text_active');
+        }
+      }
+      this.tasksList.append(task);
+    });
+  }
+}
+
+/***/ }),
+
+/***/ "./src/js/modules/task.js":
+/*!********************************!*\
+  !*** ./src/js/modules/task.js ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CommonTask: () => (/* binding */ CommonTask),
+/* harmony export */   ImportantTask: () => (/* binding */ ImportantTask),
+/* harmony export */   NormalTask: () => (/* binding */ NormalTask),
+/* harmony export */   Task: () => (/* binding */ Task)
+/* harmony export */ });
+/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../main */ "./src/js/main.js");
+
+class Task {
+  #name;
+  #count;
+  #id;
+  constructor(name, count = 0) {
+    this.#name = name;
+    this.#count = _main__WEBPACK_IMPORTED_MODULE_0__.tomato.tasks.length + 1;
+    // this.#count = count
+    this.#id = Math.floor(Math.random() * 10000);
+  }
+  // Методы
+  changeCount() {
+    this.#count--;
+    if (this.#count === 0) this.#count = 1;
+  }
+  changeName(newName) {
+    return this.#name = newName;
+  }
+  // Геттеры
+  get name() {
+    return this.#name;
+  }
+  get count() {
+    return this.#count;
+  }
+  get id() {
+    return this.#id;
+  }
+  // Сеттеры
+  set name(data) {
+    console.log('Нельзя менять данные');
+  }
+  set count(data) {
+    console.log('Нельзя менять данные');
+  }
+  set id(data) {
+    console.log('Нельзя менять данные');
+  }
+}
+class CommonTask extends Task {
+  constructor(name, count, importance = 'default') {
+    super(name, count);
+    this.importance = importance;
+  }
+}
+class NormalTask extends Task {
+  constructor(name, count, importance = 'so-so') {
+    super(name, count);
+    this.importance = importance;
+  }
+}
+class ImportantTask extends Task {
+  constructor(name, count, importance = 'important') {
+    super(name, count);
+    this.importance = importance;
+  }
+}
+
+/***/ }),
+
+/***/ "./src/js/modules/timer.js":
+/*!*********************************!*\
+  !*** ./src/js/modules/timer.js ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Timer: () => (/* binding */ Timer)
+/* harmony export */ });
+/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../main */ "./src/js/main.js");
+
+
+class Timer {
+  constructor(taskTime, pauseTime, bigPauseTime) {
+    this.taskTime = taskTime;
+    this.pauseTime = pauseTime;
+    this.bigPauseTime = bigPauseTime;
+  }
+  startTimer() {
+    const timerText = document.querySelector('.window__timer-text');
+    let time = this.taskTime * 60 * 1000;
+    timerText.textContent = `00:00`;
+    const mainTimer = setInterval(() => {
+      const minutes = Math.floor(time / 1000 / 60 % 60);
+      const seconds = Math.floor(time / 1000 % 60);
+      time -= 10000;
+      if (minutes < 10) timerText.textContent = `0${minutes}:${seconds}`;
+      if (seconds < 10) timerText.textContent = `${minutes}:0${seconds}`;
+      if (minutes < 10 && seconds < 10) {
+        timerText.textContent = `0${minutes}:0${seconds}`;
+      }
+      if (minutes >= 10 && seconds >= 10) {
+        timerText.textContent = `${minutes}:${seconds}`;
+      }
+      if (minutes <= 0 && seconds <= 0) {
+        _main__WEBPACK_IMPORTED_MODULE_0__.activeTomato.renderTasksList();
+        document.querySelector('.window__panel-task-text').textContent = _main__WEBPACK_IMPORTED_MODULE_0__.tomato.activeTask.count;
+        clearTimeout(mainTimer);
+        if (_main__WEBPACK_IMPORTED_MODULE_0__.tomato.activeTask.count % 3 === 0) {
+          time = this.bigPauseTime * 60 * 1000;
+        } else {
+          time = this.pauseTime * 60 * 1000;
+        }
+        const pauseTimer = setInterval(() => {
+          const minutes = Math.floor(time / 1000 / 60 % 60);
+          const seconds = Math.floor(time / 1000 % 60);
+          time -= 10000;
+          if (minutes < 10) timerText.textContent = `0${minutes}:${seconds}`;
+          if (seconds < 10) timerText.textContent = `${minutes}:0${seconds}`;
+          if (minutes < 10 && seconds < 10) {
+            timerText.textContent = `0${minutes}:0${seconds}`;
+            timerText.style.cssText = 'color:green';
+          }
+          if (minutes >= 10 && seconds >= 10) {
+            timerText.textContent = `${minutes}:${seconds}`;
+          }
+          if (minutes <= 0 && seconds <= 0) {
+            timerText.style.cssText = 'color:#333333';
+            clearTimeout(pauseTimer);
+          }
+        }, 1000);
+        document.addEventListener('click', e => {
+          const target = e.target;
+          if (target.closest('.button-stop')) {
+            timerText.textContent = `00:00`;
+            clearTimeout(pauseTimer);
+          }
+        });
+      }
+    }, 1000);
+    document.addEventListener('click', e => {
+      const target = e.target;
+      if (target.closest('.button-stop')) {
+        timerText.textContent = `00:00`;
+        clearTimeout(mainTimer);
+      }
+    });
+  }
+}
+
+/***/ }),
+
+/***/ "./src/js/modules/tomato.js":
+/*!**********************************!*\
+  !*** ./src/js/modules/tomato.js ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Tomato: () => (/* binding */ Tomato)
+/* harmony export */ });
+/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../main */ "./src/js/main.js");
+
+class Tomato {
+  #taskTime = 0.5;
+  #pauseTime = 1;
+  #bigPauseTime = 2;
+  count = 0;
+  constructor(tasks = []) {
+    if (Tomato.instance) {
+      return Tomato.instance;
+    }
+    this.tasks = tasks;
+    this.activeTask = null;
+    Tomato.instance = this;
+  }
+  get taskTime() {
+    return this.#taskTime;
+  }
+  get pauseTime() {
+    return this.#pauseTime;
+  }
+  get bigPauseTime() {
+    return this.#bigPauseTime;
+  }
+
+  // Добавление задачи
+  addTask(task) {
+    this.tasks.push(task);
+    this.count++;
+    _main__WEBPACK_IMPORTED_MODULE_0__.activeTomato.renderApp();
+  }
+
+  // Активировать задачу
+  activateTask(id) {
+    this.tasks.forEach(item => {
+      if (item.id === id) {
+        this.activeTask = item;
+      }
+    });
+    _main__WEBPACK_IMPORTED_MODULE_0__.activeTomato.renderApp();
+  }
+
+  //Увеличить счетчик
+  taskCount(id) {
+    this.tasks.forEach(item => {
+      if (item.id === id) {
+        item.count++;
+      }
+    });
+  }
+  taskTimerRun() {
+    if (this.activeTask === null) {
+      alert('Нет активной задачи');
+      return;
+    }
+    _main__WEBPACK_IMPORTED_MODULE_0__.timer.startTimer();
+  }
+  removeTask(task) {
+    const index = this.tasks.findIndex(item => item.name === task);
+    this.tasks.splice(index, 1);
+    this.count--;
+    this.tasks.forEach(item => item.changeCount());
+    _main__WEBPACK_IMPORTED_MODULE_0__.activeTomato.renderApp();
+  }
+}
 
 /***/ }),
 
@@ -9946,18 +10561,6 @@ try {
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -10019,7 +10622,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _css_style_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./css/style.css */ "./src/css/style.css");
 /* harmony import */ var _scss_index_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./scss/index.scss */ "./src/scss/index.scss");
 /* harmony import */ var _js_main_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./js/main.js */ "./src/js/main.js");
-/* harmony import */ var _js_main_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_js_main_js__WEBPACK_IMPORTED_MODULE_2__);
 
 
 
@@ -10027,4 +10629,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=main5763e9eb4315cc00c93c.js.map
+//# sourceMappingURL=main7f7c6f01aa085ee03d4a.js.map

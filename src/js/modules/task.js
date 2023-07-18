@@ -1,15 +1,24 @@
-export class Task { #name; #count; #id;
-    constructor(name, count =0) {
-        this.#name = name.toString();
-        this.#count = Number(count);
-        this.#id = Number(Math.floor(Math.random() * 100))
+import {tomato} from "../main";
+
+export class Task {
+    #name;
+    #count;
+    #id;
+    constructor(name, count = 0) {
+        this.#name = name;
+        this.#count = tomato.tasks.length+1
+        // this.#count = count
+        this.#id = Math.floor(Math.random() * 10000);
     }
+    // Методы
     changeCount() {
-        this.#count++;
+        this.#count--;
+        if (this.#count === 0) this.#count = 1
     }
     changeName(newName) {
         return this.#name = newName;
     }
+    // Геттеры
     get name() {
         return this.#name;
     }
@@ -19,7 +28,7 @@ export class Task { #name; #count; #id;
     get id() {
         return this.#id;
     }
-
+    // Сеттеры
     set name(data) {
         console.log('Нельзя менять данные');
     }
@@ -29,23 +38,27 @@ export class Task { #name; #count; #id;
     set id(data) {
         console.log('Нельзя менять данные');
     }
-
+}
+export class CommonTask extends Task {
+    constructor(name, count, importance = 'default') {
+        super(name, count);
+        this.importance = importance;
+    }
 }
 
-// // Создаем
-// const item = new Task('Почистить апельсин', );
-//
-// // Пробуем менять, получаем фигу
-// item.name = 'dsfsdfsdfsdfsdf'
-// console.log(item.id);
-// console.log(item.name);
-// console.log(item.count);
-//
-// // Меняем данные через методы
-// item.changeCount();
-// item.changeName('Сочный апельсин')
-//
-// // Вывод объекта с изменениями
-// console.log(`Объект с изменениями`,item)
-// console.log(item.name);
-// console.log(item.count);
+export class NormalTask extends Task {
+    constructor(name, count, importance = 'so-so') {
+        super(name, count);
+        this.importance = importance;
+    }
+}
+
+export class ImportantTask extends Task {
+    constructor(name, count, importance = 'important') {
+        super(name, count);
+        this.importance = importance;
+    }
+}
+
+
+
